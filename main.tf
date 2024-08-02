@@ -31,7 +31,7 @@ provider "kubectl" {
 
 module "metallb" {
   source             = "./modules/metallb_setup"
-  depends_on         = [module.k0s]
+  depends_on         = [module.mke4]
   lb_address_range   = module.provision.lb_address_range
 }
 
