@@ -3,11 +3,6 @@ locals {
   first_host_ip = [for host in var.provision : host.ssh.address][0]
 }
 
-locals {
-  all_ips_list = [for host in var.provision : host.ssh.address]
-  first_host_ip = [for host in var.provision : host.ssh.address][0]
-}
-
 resource "local_file" "mke4_config" {
   filename = "${path.root}/mke4.yaml"
   content  = <<EOT
