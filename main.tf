@@ -7,9 +7,9 @@ module "provision" {
   metros       = var.metros
 }
 
-module "k0s" {
+module "mke4" {
   depends_on = [module.provision]
-  source             = "./modules/k0s"
+  source             = "./modules/mke4"
   k0s_cluster_config = module.provision.k0s_cluster
   provision = module.provision.hosts
 }
@@ -35,11 +35,11 @@ module "metallb" {
   lb_address_range   = module.provision.lb_address_range
 }
 
-module "caddy" {
-  source = "./modules/caddy"
-  depends_on = [module.metallb.metallb_dependencies]
-  email = var.email
-}
+#module "caddy" {
+#  source = "./modules/caddy"
+#  depends_on = [module.metallb.metallb_dependencies]
+#  email = var.email
+#}
 
 #module "external_dns" {
 #  depends_on = [module.k0s]
@@ -68,10 +68,10 @@ module "caddy" {
 #  license_file_path = var.license_file_path
 #}
 
-module "gcp_microservices_demo" {
-  source     = "./modules/gcp_microservices_demo"
-  depends_on = [module.caddy]
-}
+#module "gcp_microservices_demo" {
+#  source     = "./modules/gcp_microservices_demo"
+#  depends_on = [module.caddy]
+#}
 
 #module "microservice_ingress" {
 #  source = "./modules/microservice_ingress"
