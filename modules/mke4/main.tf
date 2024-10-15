@@ -112,15 +112,15 @@ EOT
   }
 }
 
-#resource "null_resource" "remove_known_hosts" {
-#  provisioner "local-exec" {
-#    command = <<EOT
-#      for ip in ${join(" ", local.all_ips_list)}; do
-#        ssh-keygen -R $ip
-#      done
-#    EOT
-#  }
-#}
+resource "null_resource" "remove_known_hosts" {
+  provisioner "local-exec" {
+    command = <<EOT
+      for ip in ${join(" ", local.all_ips_list)}; do
+        ssh-keygen -R $ip
+      done
+    EOT
+  }
+}
 
 resource "null_resource" "run_mkectl_apply" {
   depends_on = [local_file.mke4_config]
