@@ -30,9 +30,7 @@ locals {
 
 resource "local_file" "metallb_config" {
   filename = "${path.root}/metallb.yaml"
-  content  = <<EOT
-${chomp(var.metallb_config)}
-EOT
+  content  = replace(chomp(var.metallb_config), "namespace: metallb", "namespace: metallb-system")
 
   provisioner "local-exec" {
     when    = destroy
@@ -65,7 +63,7 @@ spec:
                 enabled: false
       version: 0.14.7
     dryRun: false
-    enabled: false
+    enabled: true
     kind: chart
     name: metallb
     namespace: metallb-system
@@ -236,8 +234,11 @@ resource "null_resource" "run_mkectl_apply" {
 
   provisioner "local-exec" {
     command = <<EOT
-      mkectl apply -f ${local_file.mke4_config.filename} -l debug 2>&1 | tee ${path.root}/mkectl_output.log
-      grep -o 'admin:[^ ]*' ${path.root}/mkectl_output.log > ${path.root}/creds
+      if [ ! -f "${path.root}/mkectl_output.log" ]; then
+        mkectl apply -f ${local_file.mke4_config.filename} -l debug 2>&1 | tee ${path.root}/mkectl_output.log
+      else
+        mkectl apply -f ${local_file.mke4_config.filename}
+      fi
     EOT
   }
 
@@ -247,7 +248,23 @@ resource "null_resource" "run_mkectl_apply" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "rm -f ${path.root}/mkectl_output.log ${path.root}/creds"
+    command = "rm -f ${path.root}/mkectl_output.log"
+  }
+}
+
+
+resource "null_resource" "create_creds" {
+  depends_on = [null_resource.run_mkectl_apply]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      grep -o 'admin:[^ ]*' ${path.root}/mkectl_output.log > ${path.root}/creds
+    EOT
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -f ${path.root}/creds"
   }
 }
 
@@ -266,20 +283,20 @@ resource "null_resource" "set_kubeconfig_and_permissions" {
   }
 }
 
-#resource "null_resource" "apply_metallb_config" {
-#  depends_on = [
-#    null_resource.set_kubeconfig_and_permissions,
-#    local_file.metallb_config
-#  ]
-#
-#  provisioner "local-exec" {
-#    command = <<EOT
-#      kubectl --kubeconfig ${path.root}/kubeconfig apply -f ${path.root}/metallb.yaml
-#    EOT
-#  }
-#
-#  provisioner "local-exec" {
-#    when    = destroy
-#    command = "rm -f ${path.root}/kubeconfig"
-#  }
-#}
+resource "null_resource" "apply_metallb_config" {
+  depends_on = [
+    null_resource.set_kubeconfig_and_permissions,
+    local_file.metallb_config
+  ]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      kubectl --kubeconfig ${path.root}/kubeconfig apply -f ${path.root}/metallb.yaml
+    EOT
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -f ${path.root}/kubeconfig"
+  }
+}
