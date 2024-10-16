@@ -14,3 +14,7 @@ variable "provision" {
     })
   }))
 }
+
+variable "cluster_name" {
+  default = "mke"
+}
