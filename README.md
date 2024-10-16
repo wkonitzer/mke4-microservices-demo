@@ -1,6 +1,6 @@
-# Microservices Demo Project
+# MKE4 Demo Project
 
-This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl, configures a Kubernetes cluster and finally installs a demo microservices app, along with Mirantis MSR.
+This Terraform project sets up Equinix Metal servers, and creates a minimal mke4.yaml file for mkectl to use. It also creates config to input for metallb.
 
 ## Table of Contents
 
@@ -16,11 +16,9 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
 
 - **Terraform**: Version v1.x.x or above.
 - **Kubectl Toolchain**: Ensure you have a configured kubectl toolchain.
-- **GoDaddy Credentials**: Necessary to configure DNS.
 - **Equinix Metal Crendentials**: Necessary to provision the servers.
 - **k0sctl**: Installs k0s.
 - **mkectl**: Installs MKE4.
-- **Linux tools**: awk, sed, grep.
 
 ---
 
@@ -28,21 +26,8 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
 
 1. **Provision**:
    - Sets up Equinix resources.
-2. **k0s**: 
-   - Sets up k0s.
-3. **MetalLB**: 
-   - Configures MetalLB within the Kubernetes cluster.
-4. **Caddy**:
-   - Installs Caddy Server operator.
-5. **External DNS**:
-   - Installs External DNS operator.      
-6. **MSR**:
-   - Installs MSR.        
-7. **Microservices Demo**:
-   - Installs the microservice demo application.
-8. **Microservice Ingress**: 
-   - Sets up an ingress for a microservice.
-   - Configures a DNS record for it.
+2. **MKE4**: 
+   - Produces mke4.yaml file
 
 ---
 
@@ -73,6 +58,6 @@ Several variables need to be exported via environment variables:
 
   * METAL_AUTH_TOKEN
 
-Any other required variables can be set in terraform.tfvars.
+Any other required variables can be set in terraform.tfvars or equinix.auto.tfvars
 
-The terraform.tfvars.example file has the minimum required parameters listed.  
+The terraform.tfvars.example and equinix.auto.tfvars.example files have the minimum required parameters listed.  
