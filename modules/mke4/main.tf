@@ -28,6 +28,18 @@ locals {
   )
 }
 
+resource "local_file" "metallb_config" {
+  filename = "${path.root}/metallb.yaml"
+  content  = <<EOT
+${chomp(var.metallb_config)}
+EOT
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -f ${self.filename}"
+  }
+}
+
 resource "local_file" "mke4_config" {
   filename = "${path.root}/mke4.yaml"
   content  = <<EOT
@@ -185,72 +197,84 @@ EOT
   }
 }
 
-#resource "null_resource" "remove_known_hosts" {
+resource "null_resource" "remove_known_hosts" {
+  provisioner "local-exec" {
+    command = <<EOT
+      for ip in ${join(" ", local.all_ips_list)}; do
+        ssh-keygen -R $ip
+      done
+    EOT
+  }  
+}
+
+resource "null_resource" "add_kube_apiserver_user" {
+  count = length(local.all_ips_list)
+
+  connection {
+    type        = "ssh"
+    host        = local.all_ips_list[count.index]
+    user        = "root"
+    private_key = file("ssh_keys/${var.cluster_name}.pem")
+    timeout     = "2m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "useradd --home /var/lib/k0s --shell /sbin/nologin --system --no-create-home kube-apiserver"
+    ]
+  } 
+}
+
+resource "null_resource" "sleep_before_next_step" {
+  provisioner "local-exec" {
+    command = "sleep 10"
+  } 
+}
+
+resource "null_resource" "run_mkectl_apply" {
+  depends_on = [local_file.mke4_config]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      mkectl apply -f ${local_file.mke4_config.filename} -l debug 2>&1 | tee ${path.root}/mkectl_output.log
+      grep -o 'admin:[^ ]*' ${path.root}/mkectl_output.log > ${path.root}/creds
+    EOT
+  }
+
+  triggers = {
+    my_file_content = local_file.mke4_config.content
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -f ${path.root}/mkectl_output.log ${path.root}/creds"
+  }
+}
+
+resource "null_resource" "set_kubeconfig_and_permissions" {
+  depends_on = [null_resource.run_mkectl_apply]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      cp $HOME/.mke/mke.kubeconf ${path.root}/kubeconfig
+    EOT
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -f ${path.root}/kubeconfig"
+  }
+}
+
+#resource "null_resource" "apply_metallb_config" {
+#  depends_on = [
+#    null_resource.set_kubeconfig_and_permissions,
+#    local_file.metallb_config
+#  ]
+#
 #  provisioner "local-exec" {
 #    command = <<EOT
-#      for ip in ${join(" ", local.all_ips_list)}; do
-#        ssh-keygen -R $ip
-#      done
-#    EOT
-#  }
-#
-#  triggers = {
-#    my_file_content = local_file.mke4_config.content
-#  }  
-#}
-
-#resource "null_resource" "test_ssh_connections" {
-#  count = length(local.all_ips_list)
-#
-#  connection {
-#    type        = "ssh"
-#    host        = local.all_ips_list[count.index]
-#    user        = "root"
-#    private_key = file("ssh_keys/${var.cluster_name}.pem")
-#    timeout     = "2m"
-#  }
-#
-#  provisioner "remote-exec" {
-#    inline = [
-#      "echo 'SSH connection successful to ${local.all_ips_list[count.index]}'"
-#    ]
-#  }
-#
-#  triggers = {
-#    my_file_content = local_file.mke4_config.content
-#  }  
-#}
-
-#resource "null_resource" "sleep_before_next_step" {
-#  provisioner "local-exec" {
-#    command = "sleep 10"
-#  }
-#
-#  triggers = {
-#    my_file_content = local_file.mke4_config.content
-#  }  
-#}
-
-#resource "null_resource" "run_mkectl_apply" {
-#  depends_on = [local_file.mke4_config]
-#
-#  provisioner "local-exec" {
-#    command = <<EOT
-#      mkectl apply -f ${local_file.mke4_config.filename}
-#    EOT  
-#  }
-#
-#  triggers = {
-#    my_file_content = local_file.mke4_config.content
-#  }
-#}
-
-#resource "null_resource" "set_kubeconfig_and_permissions" {
-#  depends_on = [null_resource.run_k0sctl_apply]
-#
-#  provisioner "local-exec" {
-#    command = <<EOT
-#      k0sctl kubeconfig > ${path.root}/kubeconfig
+#      kubectl --kubeconfig ${path.root}/kubeconfig apply -f ${path.root}/metallb.yaml
 #    EOT
 #  }
 #

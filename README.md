@@ -8,7 +8,6 @@ This Terraform project sets up Equinix Metal servers, and creates a minimal mke4
 - [Modules](#modules)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
-- [Known Issues](#known-issues)
 
 ---
 

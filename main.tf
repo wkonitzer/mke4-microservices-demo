@@ -1,5 +1,5 @@
 module "provision" {
-  source = "github.com/wkonitzer/k0s-on-equinix-terraform-templates"
+  source       = "github.com/wkonitzer/k0s-on-equinix-terraform-templates"
   project_id   = var.project_id
   cluster_name = var.cluster_name
   master_count = var.master_count
@@ -8,11 +8,12 @@ module "provision" {
 }
 
 module "mke4" {
-  depends_on = [module.provision]
+  depends_on         = [module.provision]
   source             = "./modules/mke4"
   k0s_cluster_config = module.provision.k0s_cluster
-  provision = module.provision.hosts
-  cluster_name = var.cluster_name
+  provision          = module.provision.hosts
+  cluster_name       = var.cluster_name
+  metallb_config     = module.provision.metallb_l2
 }
 
 #provider "kubernetes" {

@@ -1,5 +1,10 @@
 variable "k0s_cluster_config" {
-  description = "Content of the k0s cluster configuration for k0sctl."
+  description = "Content of the cluster configuration for mkectl."
+  type        = string
+}
+
+variable "metallb_config" {
+  description = "Content of the metallb config"
   type        = string
 }
 
