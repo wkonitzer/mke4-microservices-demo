@@ -112,6 +112,7 @@ ${chomp(local.trimmed_k0s_cluster_config)}
     affinity:
       nodeAffinity: {}
     enabled: true
+    enableLoadBalancer: true    
     extraArgs:
       defaultSslCertificate: mke/mke-ingress.tls
       enableSslPassthrough: false
