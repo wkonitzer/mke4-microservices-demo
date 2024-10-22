@@ -1,11 +1,5 @@
-variable "godaddy_api_key" {
-  description = "API key for GoDaddy provider"
-  type        = string
-  sensitive   = true
-}
-
-variable "godaddy_api_secret" {
-  description = "API secret for GoDaddy provider"
+variable "cloudflare_api_key" {
+  description = "API key for Cloudflareprovider"
   type        = string
   sensitive   = true
 }

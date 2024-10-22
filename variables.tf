@@ -16,10 +16,6 @@ variable "use_reserved_hardware" {
   default     = false
 }
 
-variable "cluster_name" {
-  default = "mke"
-}
-
 variable "master_count" {
   default = 3
 }
@@ -39,57 +35,42 @@ variable "metros" {
   }))
 }
 
-variable "admin_password" {
-  default = "orcaorcaorca"
-}
-
 variable "email" {
   description = "The email address to be used with Ingress controllers"
   type        = string
 }
 
-variable "godaddy_api_key" {
-  description = "API key for GoDaddy provider"
-  type        = string
-  sensitive   = true
-}
-
-variable "godaddy_api_secret" {
-  description = "API secret for GoDaddy provider"
+variable "cloudflare_api_key" {
+  description = "API key for cloudflare DNS provider"
   type        = string
   sensitive   = true
 }
 
 variable "domain_name" {
-  description = "The domain name for the microservice."
+  description = "The domain name for the cluster."
   type        = string
 }
 
-variable "server_name" {
-  description = "The server name or subdomain for the microservice."
+variable "cluster_name" {
+  description = "Server name for the MKE LB/ingress"
   type        = string
-}
-
-variable "mke_server_name" {
-  description = "Server name for the MKE LB"
-  type        = string
-  default     = "mke"
+  default     = "mke4"
 }
 
 variable "longhorn_server_name" {
   description = "Server name for the Longhorn module"
   type        = string
-  default     = "longhorn"
+  default     = "mke4-longhorn"
 }
 
 variable "msr_server_name" {
   description = "Server name for the MSR module"
   type        = string
-  default     = "msr"
+  default     = "mke4-msr"
 }
 
 variable "microservice_server_name" {
   description = "Server name for the Microservice module"
   type        = string
-  default     = "microservice"
+  default     = "mke4-microservice"
 }

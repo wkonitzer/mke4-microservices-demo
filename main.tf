@@ -7,15 +7,22 @@ module "provision" {
   metros       = var.metros
 }
 
-#module "mke4" {
-#  depends_on = [module.provision]
-#  source             = "./modules/mke4"
-#  k0s_cluster_config = module.provision.k0s_cluster
-#  provision = module.provision.hosts
-#}
+module "mke4" {
+  depends_on         = [module.provision]
+  source             = "./modules/mke4"
+  k0s_cluster_config = module.provision.k0s_cluster
+  provision          = module.provision.hosts
+  cluster_name       = var.cluster_name
+  metallb_config     = module.provision.metallb_l2
+  domain_name        = var.domain_name
+}
+
+locals {
+  kubeconfig_exists = fileexists("${path.root}/kubeconfig")
+}
 
 provider "kubernetes" {
-  config_path = "${path.root}/kubeconfig"
+  config_path = local.kubeconfig_exists ? "${path.root}/kubeconfig" : ""
 }
 
 provider "helm" {
@@ -29,28 +36,33 @@ provider "kubectl" {
   load_config_file       = true
 }
 
+module "certman" {
+  source             = "./modules/certman_setup"
+  depends_on         = [module.mke4]
+  email              = var.email
+}
+
 module "metallb" {
   source             = "./modules/metallb_setup"
-#  depends_on         = [module.mke4]
+  depends_on         = [module.mke4]
   lb_address_range   = module.provision.lb_address_range
 }
 
-module "caddy" {
-  source = "./modules/caddy"
-  depends_on = [module.metallb.metallb_dependencies]
-  email = var.email
-}
+#module "caddy" {
+#  source = "./modules/caddy"
+#  depends_on = [module.metallb.metallb_dependencies]
+#  email = var.email
+#}
 
 module "external_dns" {
-#  depends_on = [module.k0s]
+  depends_on         = [module.mke4]
   source             = "./modules/external_dns"
-  godaddy_api_key    = var.godaddy_api_key
-  godaddy_api_secret = var.godaddy_api_secret
-  domain_name = var.domain_name
+  cloudflare_api_key = var.cloudflare_api_key
+  domain_name        = var.domain_name
 }
 
 #module "longhorn" {
-#  depends_on = [module.k0s, module.caddy, module.metallb, module.external_dns]
+#  depends_on = [module.mke4, module.metallb, module.external_dns]
 #  source     = "./modules/longhorn" 
 #  provision  = module.provision.hosts
 #  domain_name = var.domain_name
@@ -71,13 +83,13 @@ module "external_dns" {
 
 module "gcp_microservices_demo" {
   source     = "./modules/gcp_microservices_demo"
-  depends_on = [module.caddy]
+  depends_on = [module.mke4]
 }
 
-#module "microservice_ingress" {
-#  source = "./modules/microservice_ingress"
-#  depends_on  = [module.caddy, module.gcp_microservices_demo, module.external_dns]
-#  namespace = module.gcp_microservices_demo.created_namespace
-#  domain_name = var.domain_name
-#  server_name = var.microservice_server_name
-#}
+module "microservice_ingress" {
+  source = "./modules/microservice_ingress"
+  depends_on  = [module.gcp_microservices_demo, module.external_dns]
+  namespace = module.gcp_microservices_demo.created_namespace
+  domain_name = var.domain_name
+  server_name = var.microservice_server_name
+}

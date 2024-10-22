@@ -1,21 +1,3 @@
-resource "helm_release" "metallb" {
-  create_namespace = true
-  name       = "metallb"
-  namespace  = "metallb-system"
-  chart      = "metallb"
-  repository = "https://metallb.github.io/metallb"
-  version    = var.chart_version
-
-  set {
-    name  = "speaker.memberlist.mlBindPort"
-    value = "17946"
-  }
-
-  provisioner "local-exec" {
-    command = "sleep 30"
-  }
-}
-
 resource "kubectl_manifest" "ip_address_pool" {
   yaml_body = <<-YAML
 apiVersion: metallb.io/v1beta1
@@ -27,8 +9,6 @@ spec:
   addresses:
     - "${var.lb_address_range}" 
   YAML
-
-  depends_on =[helm_release.metallb]
 }
 
 resource "kubectl_manifest" "l2_advertisement" {
@@ -39,8 +19,6 @@ metadata:
   name: example
   namespace: metallb-system
   YAML
-
-  depends_on =[helm_release.metallb]
 }
 
 resource "null_resource" "metallb_dependencies" {
