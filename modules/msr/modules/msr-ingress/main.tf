@@ -3,11 +3,17 @@ resource "kubernetes_ingress_v1" "msr_ingress" {
     name      = "msr-ingress"
     namespace = "msr"
     annotations = {
-      "kubernetes.io/ingress.class" = "caddy"
-      "caddy.ingress.kubernetes.io/backend-protocol" = "HTTPS"
+      "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
+      "nginx.ingress.kubernetes.io/backend-protocol" = "HTTPS"
     }
   }
   spec {
+    ingress_class_name = "nginx-default"
+
+    tls {
+      hosts = ["${var.server_name}.${var.domain_name}"]
+      secret_name = "msr-tls"
+    }  
     rule {
       host = "${var.server_name}.${var.domain_name}"
       http {

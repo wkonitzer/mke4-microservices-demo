@@ -32,7 +32,7 @@ variable "admin_password" {
   type        = string
 }
 
-variable "host" {
-  description = "The MKE Host"
-  type        = string
-}
+#variable "host" {
+#  description = "The MKE Host"
+#  type        = string
+#}

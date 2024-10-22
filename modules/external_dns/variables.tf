@@ -4,8 +4,7 @@ variable "cloudflare_api_key" {
   sensitive   = true
 }
 
-variable "domain_name" {
-  description = "The domain name for the microservice."
-  type        = string
+variable "cluster_name" {
+  default = "mke4"
 }
 

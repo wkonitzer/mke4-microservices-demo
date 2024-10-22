@@ -35,6 +35,16 @@ variable "metros" {
   }))
 }
 
+variable "admin_password" {
+  default = "orcaorcaorca"
+}
+
+variable "license_file_path" {
+  description = "Path to the Docker Enterprise license file"
+  type        = string
+  default     = null
+}
+
 variable "email" {
   description = "The email address to be used with Ingress controllers"
   type        = string

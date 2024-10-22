@@ -1,13 +1,9 @@
-module "cert-manager" {
-  source    = "./modules/cert-manager" 
-}
-
 module "postgres" {
   source    = "./modules/postgres-operator" 
 }
 
 module "msr_setup" {
-  depends_on         = [module.postgres, module.cert-manager]
+  depends_on         = [module.postgres]
   source    = "./modules/msr_setup"
   license_file_path = var.license_file_path 
 }

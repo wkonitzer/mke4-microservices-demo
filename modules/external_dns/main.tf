@@ -35,6 +35,7 @@ resource "helm_release" "external_dns" {
           secretKeyRef:
             name: cloudflare-api-key
             key: apiKey
+    txtPrefix: "${var.cluster_name}"
     EOF
   ]
 }         

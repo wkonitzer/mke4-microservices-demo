@@ -17,12 +17,8 @@ module "mke4" {
   domain_name        = var.domain_name
 }
 
-locals {
-  kubeconfig_exists = fileexists("${path.root}/kubeconfig")
-}
-
 provider "kubernetes" {
-  config_path = local.kubeconfig_exists ? "${path.root}/kubeconfig" : ""
+  config_path = "${path.root}/kubeconfig"
 }
 
 provider "helm" {
@@ -48,38 +44,31 @@ module "metallb" {
   lb_address_range   = module.provision.lb_address_range
 }
 
-#module "caddy" {
-#  source = "./modules/caddy"
-#  depends_on = [module.metallb.metallb_dependencies]
-#  email = var.email
-#}
-
 module "external_dns" {
   depends_on         = [module.mke4]
   source             = "./modules/external_dns"
   cloudflare_api_key = var.cloudflare_api_key
-  domain_name        = var.domain_name
+  cluster_name       = var.cluster_name
 }
 
-#module "longhorn" {
-#  depends_on = [module.mke4, module.metallb, module.external_dns]
-#  source     = "./modules/longhorn" 
-#  provision  = module.provision.hosts
-#  domain_name = var.domain_name
-#  server_name = var.longhorn_server_name
-#  admin_username = "admin"
-#  admin_password  = var.admin_password
-#  host = module.k0s.first_manager_ip
-#  host = "139.178.91.243"
-#}
+module "longhorn" {
+  depends_on = [module.mke4, module.metallb, module.external_dns]
+  source     = "./modules/longhorn" 
+  provision  = module.provision.hosts
+  domain_name = var.domain_name
+  server_name = var.longhorn_server_name
+  admin_username = "admin"
+  admin_password  = var.admin_password
+  #host = module.mke4.first_manager_ip
+}
 
-#module "msr" {
-#  depends_on = [module.longhorn, module.external_dns]
-#  source     = "./modules/msr" 
-#  domain_name = var.domain_name
-#  server_name = var.msr_server_name
-#  license_file_path = var.license_file_path
-#}
+module "msr" {
+  depends_on = [module.longhorn, module.external_dns]
+  source     = "./modules/msr" 
+  domain_name = var.domain_name
+  server_name = var.msr_server_name
+  license_file_path = var.license_file_path
+}
 
 module "gcp_microservices_demo" {
   source     = "./modules/gcp_microservices_demo"

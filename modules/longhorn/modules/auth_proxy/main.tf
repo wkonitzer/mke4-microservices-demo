@@ -114,8 +114,15 @@ metadata:
   name: longhorn-ingress
   namespace: longhorn-system
   annotations:
-    kubernetes.io/ingress.class: caddy
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
+  ingressClassName: "nginx-default"
+
+  tls:
+  - hosts:
+    - "${var.server_name}.${var.domain_name}"
+    secretName: longhorn-tls
+
   rules:
   - host: "${var.server_name}.${var.domain_name}"
     http:

@@ -6,8 +6,8 @@ resource "helm_release" "longhorn" {
   repository = "https://charts.longhorn.io"
   version    = var.chart_version
 
-  set {
-    name  = "csi.kubeletRootDir"
-    value = "/var/lib/kubelet"
-  }
+  #set {
+  #  name  = "csi.kubeletRootDir"
+  #  value = "/var/lib/kubelet"
+  #}
 }
