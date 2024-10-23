@@ -1,6 +1,6 @@
 # Microservices Demo Project
 
-This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl, configures a Kubernetes cluster and finally installs a demo microservices app, along with Mirantis MSR.
+This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl, configures a Kubernetes cluster and finally installs a demo microservices app, Longhorn for storage, extgernal-DNS and Mirantis MSR 3.1.
 
 ## Table of Contents
 
@@ -16,11 +16,10 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
 
 - **Terraform**: Version v1.x.x or above.
 - **Kubectl Toolchain**: Ensure you have a configured kubectl toolchain.
-- **GoDaddy Credentials**: Necessary to configure DNS.
+- **Cloudflare Credentials**: Necessary to configure DNS.
 - **Equinix Metal Crendentials**: Necessary to provision the servers.
 - **k0sctl**: Installs k0s.
 - **mkectl**: Installs MKE4.
-- **Linux tools**: awk, sed, grep.
 
 ---
 
@@ -28,19 +27,21 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
 
 1. **Provision**:
    - Sets up Equinix resources.
-2. **k0s**: 
-   - Sets up k0s.
-3. **MetalLB**: 
-   - Configures MetalLB within the Kubernetes cluster.
-4. **Caddy**:
-   - Installs Caddy Server operator.
+2. **MKE4**: 
+   - Sets up MKE4.
+3. **Cert-Manager**: 
+   - Configures Cert-manager within the cluster for letsencrypt. 
+4. **MetalLB**: 
+   - Configures MetalLB within the Kubernetes cluster.     
 5. **External DNS**:
-   - Installs External DNS operator.      
-6. **MSR**:
+   - Installs External DNS operator.
+6. **Longhorn**:
+   - Installs Longhorn Storage.     
+7. **MSR**:
    - Installs MSR.        
-7. **Microservices Demo**:
+8. **Microservices Demo**:
    - Installs the microservice demo application.
-8. **Microservice Ingress**: 
+9. **Microservice Ingress**: 
    - Sets up an ingress for a microservice.
    - Configures a DNS record for it.
 
@@ -48,7 +49,7 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
 
 ## Quick Start
 
-1. **Instakk Prerequisites**:
+1. **Install Prerequisites**:
    ```bash
    sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Mirantis/mke-docs/main/content/docs/getting-started/install.sh)"
    ```
@@ -56,11 +57,19 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
    ```bash
    terraform init
    ```
-3. **Terrafom Plan**:
+3. **Terrafom Plan Infrastructure**:
+   ```bash 
+   terraform plan -target=module.mke4
+   ```
+4. **Terraform Apply Infrastructure**:
+   ```bash   
+   terraform apply
+   ```
+5. **Terrafom Plan (everything else)**:
    ```bash 
    terraform plan
    ```
-4. **Terraform Apply**:
+6. **Terraform Apply (everything else)**:
    ```bash   
    terraform apply
    ```
@@ -73,6 +82,12 @@ Several variables need to be exported via environment variables:
 
   * METAL_AUTH_TOKEN
 
-Any other required variables can be set in terraform.tfvars.
+Any other required variables can be set in terraform.tfvars or equinix.auto.tfvars
 
-The terraform.tfvars.example file has the minimum required parameters listed.  
+The terraform.tfvars.example and equinix.auto.tfvars.example files have the minimum required parameters listed.  
+
+--
+
+## Known Issues
+
+None
