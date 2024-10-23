@@ -84,3 +84,9 @@ variable "microservice_server_name" {
   type        = string
   default     = "mke4-microservice"
 }
+
+variable "trigger_cleanup" {
+  type    = bool
+  default = false
+  description = "Controls whether the external-dns cleanup is triggered during destroy"
+}

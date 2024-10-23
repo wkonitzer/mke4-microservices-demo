@@ -8,3 +8,7 @@ variable "cluster_name" {
   default = "mke4"
 }
 
+variable "trigger_cleanup" {
+  type    = bool
+  description = "Controls whether the external-dns cleanup is triggered during destroy"
+}

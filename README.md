@@ -93,5 +93,5 @@ The terraform.tfvars.example and equinix.auto.tfvars.example files have the mini
 To destroy run
 ```bash
 terraform state rm module.longhorn.module.longhorn.helm_release.longhorn
-terraform destroy
+terraform destroy -var="trigger_cleanup=true"
 ```

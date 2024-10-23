@@ -49,6 +49,7 @@ module "external_dns" {
   source             = "./modules/external_dns"
   cloudflare_api_key = var.cloudflare_api_key
   cluster_name       = var.cluster_name
+  trigger_cleanup    = var.trigger_cleanup
 }
 
 module "longhorn" {

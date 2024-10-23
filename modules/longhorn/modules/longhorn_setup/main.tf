@@ -14,7 +14,7 @@ resource "helm_release" "longhorn" {
 
 resource "null_resource" "wait_for_ready" {
   provisioner "local-exec" {
-    command = "sleep 10"
+    command = "sleep 30"
   } 
 }
 
