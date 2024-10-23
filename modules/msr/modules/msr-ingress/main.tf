@@ -5,6 +5,7 @@ resource "kubernetes_ingress_v1" "msr_ingress" {
     annotations = {
       "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
       "nginx.ingress.kubernetes.io/backend-protocol" = "HTTPS"
+      "nginx.ingress.kubernetes.io/proxy-body-size" = "0"
     }
   }
   spec {
