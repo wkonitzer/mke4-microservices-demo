@@ -12,34 +12,37 @@ resource "helm_release" "longhorn" {
   #}
 }
 
-resource "kubernetes_manifest" "longhorn_storageclass_patch" {
-  manifest = {
-    "apiVersion" = "v1"
-    "kind" = "ConfigMap"
-    "metadata" = {
-      "name"      = "longhorn-storageclass"
-      "namespace" = "longhorn-system"
-    }
-    "data" = {
-      "storageclass.yaml" = <<-EOT
-        kind: StorageClass
-        apiVersion: storage.k8s.io/v1
-        metadata:
-          name: longhorn
-          annotations:
-            storageclass.kubernetes.io/is-default-class: "true"
-        provisioner: driver.longhorn.io
-        allowVolumeExpansion: true
-        reclaimPolicy: "Delete"
-        volumeBindingMode: Immediate
-        parameters:
-          numberOfReplicas: "1" # Updated to 1
-          staleReplicaTimeout: "30"
-          fromBackup: ""
-          fsType: "ext4"
-          dataLocality: "disabled"
-          unmapMarkSnapChainRemoved: "ignored"
-      EOT
-    }
-  }
+resource "null_resource" "wait_for_ready" {
+  provisioner "local-exec" {
+    command = "sleep 10"
+  } 
+}
+
+resource "kubectl_manifest" "longhorn_storageclass_patch" {
+  yaml_body = <<-YAML
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: longhorn-storageclass
+  namespace: longhorn-system
+data:
+  storageclass.yaml: |
+    kind: StorageClass
+    apiVersion: storage.k8s.io/v1
+    metadata:
+      name: longhorn
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: driver.longhorn.io
+    allowVolumeExpansion: true
+    reclaimPolicy: "Delete"
+    volumeBindingMode: Immediate
+    parameters:
+      numberOfReplicas: "1" # Changed to 1
+      staleReplicaTimeout: "30"
+      fromBackup: ""
+      fsType: "ext4"
+      dataLocality: "disabled"
+      unmapMarkSnapChainRemoved: "ignored"
+  YAML
 }
