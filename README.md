@@ -73,6 +73,11 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
    ```bash   
    terraform apply
    ```
+7. **To Destroy**:
+   ```bash
+   terraform state rm module.longhorn.module.longhorn.helm_release.longhorn
+   terraform destroy -var="trigger_cleanup=true"
+   ```
 
 ---
 
@@ -90,8 +95,4 @@ The terraform.tfvars.example and equinix.auto.tfvars.example files have the mini
 
 ## Known Issues
 
-To destroy run
-```bash
-terraform state rm module.longhorn.module.longhorn.helm_release.longhorn
-terraform destroy -var="trigger_cleanup=true"
-```
+DNS entries are not removed automatically and will require manual cleanup.
