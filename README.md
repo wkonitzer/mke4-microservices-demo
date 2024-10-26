@@ -63,7 +63,7 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
    ```
 4. **Terraform Apply Infrastructure**:
    ```bash   
-   terraform apply
+   terraform apply -target=module.mke4
    ```
 5. **Terrafom Plan (everything else)**:
    ```bash 
