@@ -90,3 +90,8 @@ variable "trigger_cleanup" {
   default = false
   description = "Controls whether the external-dns cleanup is triggered during destroy"
 }
+
+variable "operating_system" {
+  type    = string
+  default = "ubuntu_22_04"
+}
