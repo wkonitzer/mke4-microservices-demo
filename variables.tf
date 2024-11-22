@@ -95,3 +95,8 @@ variable "operating_system" {
   type    = string
   default = "ubuntu_22_04"
 }
+
+variable "machine_size" {
+  default = "c3.small.x86"
+  type    = string
+}
