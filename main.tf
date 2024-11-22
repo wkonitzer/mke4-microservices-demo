@@ -6,6 +6,7 @@ module "provision" {
   worker_count       = var.worker_count
   metros             = var.metros
   operating_system   = var.operating_system
+  machine_size       = var.machine_size
 }
 
 module "mke4" {
