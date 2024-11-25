@@ -55,7 +55,7 @@ module "external_dns" {
 }
 
 module "longhorn" {
-  depends_on         = [module.mke4, module.metallb, module.external_dns]
+  depends_on         = [module.mke4, module.metallb, module.external_dns, module.certman]
   source             = "./modules/longhorn" 
   provision          = module.provision.hosts
   domain_name        = var.domain_name
