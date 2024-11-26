@@ -28,3 +28,9 @@ variable "domain_name" {
   description = "The domain name for the cluster."
   type        = string
 }
+
+variable "include_external_address" {
+  description = "Include externalAddress in mke4 configuration"
+  type        = bool
+  default     = false
+}

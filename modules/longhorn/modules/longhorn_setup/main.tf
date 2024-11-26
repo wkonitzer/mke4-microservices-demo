@@ -19,6 +19,7 @@ resource "null_resource" "wait_for_ready" {
 }
 
 resource "kubectl_manifest" "longhorn_storageclass_patch" {
+  depends_on = [helm_release.longhorn]
   yaml_body = <<-YAML
 apiVersion: v1
 kind: ConfigMap

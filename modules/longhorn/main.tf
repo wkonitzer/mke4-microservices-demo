@@ -3,10 +3,6 @@ module "os_config" {
   provision = var.provision
 }
 
-#module "taints" {
-#  source     = "./modules/taints"
-#}
-
 module "longhorn" {
   source             = "./modules/longhorn_setup"
   depends_on         = [module.os_config]

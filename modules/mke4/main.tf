@@ -67,6 +67,7 @@ spec:
     encryptionProvider: /var/lib/k0s/encryption.cfg
     eventRateLimit:
       enabled: false
+    ${var.include_external_address ? "" : "externalAddress: \"${var.cluster_name}.${var.domain_name}\""}  
     requestTimeout: 1m0s
   authentication:
     expiry:
@@ -97,7 +98,6 @@ spec:
   dns:
     lameduck: {}
   etcd: {}
-  externalAddress: "${var.cluster_name}.${var.domain_name}"
 ${chomp(local.trimmed_k0s_cluster_config)}
   ingressController:
     affinity:
@@ -227,7 +227,8 @@ resource "null_resource" "run_mkectl_apply" {
   provisioner "local-exec" {
     command = <<EOT
       if [ ! -f "${path.root}/mkectl_output.log" ]; then
-        mkectl apply -f ${local_file.mke4_config.filename} -l debug 2>&1 | tee ${path.root}/mkectl_output.log
+        mkectl apply -f ${local_file.mke4_config.filename} -l debug 2>&1 | tee ${path.root}/mkectl_output.log && sync &
+        wait
       else
         mkectl apply -f ${local_file.mke4_config.filename}
       fi
@@ -244,9 +245,18 @@ resource "null_resource" "run_mkectl_apply" {
   }
 }
 
+resource "null_resource" "wait_for_ready" {
+  depends_on = [null_resource.run_mkectl_apply]
+  
+  provisioner "local-exec" {
+    command = "sleep 30"
+  } 
+}
+
+
 
 resource "null_resource" "create_creds" {
-  depends_on = [null_resource.run_mkectl_apply]
+  depends_on = [null_resource.wait_for_ready]
 
   provisioner "local-exec" {
     command = <<EOT
@@ -275,7 +285,7 @@ resource "null_resource" "set_kubeconfig_and_permissions" {
   }
 }
 
-resource "null_resource" "wait_for_ready" {
+resource "null_resource" "wait_for_ready2" {
   provisioner "local-exec" {
     command = "sleep 30"
   } 

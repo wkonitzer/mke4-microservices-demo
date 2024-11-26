@@ -59,30 +59,29 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
    ```
 3. **Terrafom Plan Infrastructure**:
    ```bash 
-   terraform plan -target=module.mke4
+   terraform plan -target=module.mke4 -var="is_proxy_ready=false"
    ```
 4. **Terraform Apply Infrastructure**:
    ```bash   
-   terraform apply -target=module.mke4
+   terraform apply -target=module.mke4 -var="is_proxy_ready=false"
    ```
-5. **Terraform Apply Infrstructure**:
+5. **Terraform Apply Additional Infrstructure**:
    ```bash
    terraform apply -target=module.longhorn
    terraform apply -target=module.proxy_setup -var="delete_ingress=false"
-   terraform apply -target=module.mke4 -var="is_proxy_ready=true"
+   terraform apply -target=module.mke4
    terraform apply -target=module.mke4_cacert_update
    terraform apply -target=module.proxy_setup
-   terraform apply
    ```
-5. **Terrafom Plan (everything else)**:
+6. **Terrafom Plan (everything else)**:
    ```bash 
    terraform plan
    ```
-6. **Terraform Apply (everything else)**:
+7. **Terraform Apply (everything else)**:
    ```bash   
    terraform apply
    ```
-7. **To Destroy**:
+8. **To Destroy**:
    ```bash
    terraform state rm module.longhorn.module.longhorn.helm_release.longhorn
    terraform destroy -var="trigger_cleanup=true"

@@ -100,3 +100,13 @@ variable "machine_size" {
   default = "c3.small.x86"
   type    = string
 }
+
+variable "is_proxy_ready" {
+  description = "Variable to determin if proxy module has been setup"
+  type        = bool
+  default     = false
+}
+
+variable "delete_ingress" {
+  default = true
+}
