@@ -1,5 +1,5 @@
 # Overrides for server names if defaults aren't suitable
 mke_server_name          = "mke4"
-longhorn_server_name     = "longhorn-mke4"
-msr_server_name          = "msr3-mke4"
-microservice_server_name = "microservice-mke4"
+longhorn_server_name     = "mke4-longhorn"
+msr_server_name          = "mke4-msr3"
+microservice_server_name = "mke4-microservice"
