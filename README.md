@@ -68,8 +68,10 @@ This Terraform project sets up Equinix Metal servers, installs mk4 using mkectl,
 5. **Terraform Apply Infrstructure**:
    ```bash
    terraform apply -target=module.longhorn
-   terraform apply -target=module.proxy_setup
+   terraform apply -target=module.proxy_setup -var="delete_ingress=false"
    terraform apply -target=module.mke4 -var="is_proxy_ready=true"
+   terraform apply -target=module.proxy_setup
+   
    ```
 5. **Terrafom Plan (everything else)**:
    ```bash 
