@@ -65,6 +65,20 @@ resource "null_resource" "update_oidc_config" {
   depends_on = [local_file.root_certificate]
 }
 
+resource "null_resource" "update_kubeconfig" {
+  provisioner "local-exec" {
+    command = <<EOT
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' 's|server: .*|server: https://${var.cluster_name}.${var.domain_name}:6443|' ${path.root}/kubeconfig
+        sed -i '' 's|server: .*|server: https://${var.cluster_name}.${var.domain_name}:6443|' ~/.mke/mke.kubeconf
+      else
+        sed -i 's|server: .*|server: https://${var.cluster_name}.${var.domain_name}:6443|' ${path.root}/kubeconfig
+        sed -i 's|server: .*|server: https://${var.cluster_name}.${var.domain_name}:6443|' ~/.mke/mke.kubeconf
+      fi
+    EOT
+  }
+}
+
 resource "null_resource" "append_ca_to_secret" {
   provisioner "local-exec" {
     command = <<EOT
@@ -79,5 +93,5 @@ resource "null_resource" "append_ca_to_secret" {
     EOT
   }
 
-  depends_on = [local_file.root_certificate]
+  depends_on = [local_file.root_certificate, null_resource.update_kubeconfig]
 }

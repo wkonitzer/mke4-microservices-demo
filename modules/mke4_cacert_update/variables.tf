@@ -13,3 +13,8 @@ variable "provision" {
 variable "cluster_name" {
   default = "mke4"
 }
+
+variable "domain_name" {
+  description = "The domain name for the cluster."
+  type        = string
+}
